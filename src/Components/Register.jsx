@@ -1,57 +1,62 @@
-import { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { FiUser, FiMail, FiLock, FiAlertCircle, FiEdit } from 'react-icons/fi';
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { FiUser, FiMail, FiLock, FiAlertCircle, FiEdit } from "react-icons/fi";
+
+import ToastService from "../assets/toastService";
+
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000",
+});
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: ''
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
   });
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const { firstName, lastName, email, password } = formData;
 
-  const onChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const onChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const onSubmit = async e => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    ToastService.dismiss();
     setIsLoading(true);
+    ToastService.loading("register-loading", "Criando sua conta...");
 
     try {
-      await axios.post('http://localhost:5000/auth/register', formData);
-      navigate('/login');
+      await api.post("/auth/register", formData);
+      ToastService.dismiss("register-loading");
+      ToastService.success("Conta criada com sucesso! Faça login.");
+      navigate("/login");
     } catch (err) {
-      setError(err.response?.data?.msg || 'Erro ao criar conta. Tente novamente.');
+      ToastService.dismiss("register-loading");
+      ToastService.error(
+        err.response?.data?.msg || "Erro ao criar conta. Tente novamente."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="login-wrapper">
+    <div className="login-wrapper" role="main" aria-label="Registro de nova conta">
       <div className="login-card">
-        <h1>
-          Junte-se ao <span style={{ color: '#2e9e8f' }}>Ajuda Ong</span>
+        <h1 tabIndex={0}>
+          Junte-se ao <span style={{ color: "#2e9e8f" }}>Ajuda Ong</span>
         </h1>
         <p className="subtitle">Crie sua conta grátis!</p>
 
-        {error && (
-          <div className="error-msg">
-            <FiAlertCircle />
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={onSubmit}>
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem' }}>
+        <form onSubmit={onSubmit} noValidate>
+          <div style={{ display: "flex", gap: "1rem", marginBottom: "1.25rem" }}>
             <div className="input-group" style={{ flex: 1 }}>
-              <FiUser />
+              <FiUser aria-hidden="true" />
               <input
                 type="text"
                 name="firstName"
@@ -60,11 +65,12 @@ const Register = () => {
                 onChange={onChange}
                 required
                 aria-label="Nome"
+                disabled={isLoading}
               />
             </div>
 
             <div className="input-group" style={{ flex: 1 }}>
-              <FiUser />
+              <FiUser aria-hidden="true" />
               <input
                 type="text"
                 name="lastName"
@@ -73,12 +79,13 @@ const Register = () => {
                 onChange={onChange}
                 required
                 aria-label="Sobrenome"
+                disabled={isLoading}
               />
             </div>
           </div>
 
           <div className="input-group">
-            <FiMail />
+            <FiMail aria-hidden="true" />
             <input
               type="email"
               name="email"
@@ -88,12 +95,12 @@ const Register = () => {
               required
               aria-label="Email"
               autoComplete="email"
+              disabled={isLoading}
             />
           </div>
 
-          {/* Senha */}
           <div className="input-group">
-            <FiLock />
+            <FiLock aria-hidden="true" />
             <input
               type="password"
               name="password"
@@ -104,27 +111,41 @@ const Register = () => {
               required
               aria-label="Senha"
               autoComplete="new-password"
+              disabled={isLoading}
             />
           </div>
 
-          <button type="submit" disabled={isLoading} className="login-btn" aria-busy={isLoading}>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="login-btn"
+            aria-busy={isLoading}
+            aria-label="Criar conta"
+          >
             {isLoading ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              <div
+                className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"
+                aria-hidden="true"
+              ></div>
             ) : (
               <>
-                <FiEdit />
-                Criar Conta
+                <FiEdit aria-hidden="true" /> Criar Conta
               </>
             )}
           </button>
         </form>
 
-        <div className="links-container" style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-          Já tem uma conta?{' '}
+        <div
+          className="links-container"
+          style={{ marginTop: "1.5rem", textAlign: "center" }}
+        >
+          Já tem uma conta?{" "}
           <a href="/login" className="link-register">
             Faça login aqui
           </a>
         </div>
+
+        <ToastService.ToastContainer />
       </div>
     </div>
   );

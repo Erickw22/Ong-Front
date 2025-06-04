@@ -5,8 +5,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "../styles/Home.css";
 import axios from "axios";
-import logo from '../assets/logo02.png';
-
+import logo from "../assets/logo02.png";
 
 import ToastService from "../assets/toastService";
 import { ToastContainer } from "react-toastify";
@@ -21,7 +20,7 @@ L.Icon.Default.mergeOptions({
 });
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/ongs",
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000",
 });
 
 const Home = () => {
@@ -34,19 +33,14 @@ const Home = () => {
       setLoading(true);
       ToastService.loading("loading-toast", "Carregando lista de ONGs...");
       try {
-        const res = await api.get("/list");
+        const res = await api.get("/ongs/list");
         setOngs(res.data);
         ToastService.dismiss("loading-toast");
         ToastService.success("Lista de ONGs carregada com sucesso!");
       } catch (err) {
         ToastService.dismiss("loading-toast");
-        console.error(
-          "Erro ao buscar ONGs:",
-          err.response || err.message || err
-        );
-        ToastService.error(
-          "Erro ao carregar a lista de ONGs. Tente novamente mais tarde."
-        );
+        console.error("Erro ao buscar ONGs:", err.response || err.message || err);
+        ToastService.error("Erro ao carregar a lista de ONGs. Tente novamente mais tarde.");
       } finally {
         setLoading(false);
       }
@@ -57,12 +51,12 @@ const Home = () => {
 
   return (
     <div className="home-wrapper">
-      <nav className="nav fixed-nav">
-        <Link className="logo" to="/">
-          <img src={logo} alt="Ajude uma ONG" style={{ height: '90px' }} />
+      <nav className="nav fixed-nav" role="navigation" aria-label="Menu principal">
+        <Link className="logo" to="/" aria-label="Página inicial">
+          <img src={logo} alt="Ajude uma ONG" style={{ height: "90px" }} />
         </Link>
         <div className="nav-buttons">
-          <Link to="/profile" className="btn-base btn-link">
+          <Link to="/profile" className="btn-base btn-link" aria-label="Perfil do usuário">
             Perfil
           </Link>
         </div>
@@ -78,6 +72,7 @@ const Home = () => {
             center={[-8.0476, -34.877]}
             zoom={10}
             style={{ height: "400px", width: "100%" }}
+            aria-label="Mapa interativo das ONGs"
           >
             <TileLayer
               attribution="&copy; OpenStreetMap contributors"
@@ -90,6 +85,8 @@ const Home = () => {
                   <Marker
                     key={ong._id}
                     position={[ong.location.lat, ong.location.lng]}
+                    keyboard={true}
+                    title={ong.name}
                   >
                     <Popup>
                       <strong>{ong.name}</strong>
@@ -104,16 +101,16 @@ const Home = () => {
           </MapContainer>
         </section>
 
-        <section aria-labelledby="lista-ongs">
+        <section aria-labelledby="lista-ongs" className="ongs-list-section">
           <h2 id="lista-ongs" className="title-secondary">
             Lista de ONGs
           </h2>
-          <div className="ngo-grid">
+          <div className="ngo-grid" role="list">
             {loading ? (
-              <p>Carregando ONGs...</p>
+              <p aria-live="polite">Carregando ONGs...</p>
             ) : ongs.length > 0 ? (
               ongs.map((ong) => (
-                <article key={ong._id} className="highlight-card">
+                <article key={ong._id} className="highlight-card" role="listitem" tabIndex={0}>
                   <h3 className="ngo-name">{ong.name}</h3>
                   <p>
                     <strong>Endereço:</strong> {ong.address}
@@ -121,21 +118,20 @@ const Home = () => {
                   <p>
                     <strong>Telefone:</strong> {ong.phone}
                   </p>
-                  <Link to={`/ong/${ong._id}`} className="btn-link">
+                  <Link to={`/ong/${ong._id}`} className="btn-link" aria-label={`Ver detalhes da ONG ${ong.name}`}>
                     Ver detalhes
                   </Link>
                 </article>
               ))
             ) : (
-              <p>Nenhuma ONG encontrada.</p>
+              <p aria-live="polite">Nenhuma ONG encontrada.</p>
             )}
           </div>
         </section>
       </main>
 
-      <footer className="footer">
-        &copy; {new Date().getFullYear()} Ajude-ong. Todos os direitos
-        reservados.
+      <footer className="footer" role="contentinfo">
+        &copy; {new Date().getFullYear()} Ajude-ong. Todos os direitos reservados.
       </footer>
 
       <ToastContainer />

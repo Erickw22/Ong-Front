@@ -1,15 +1,23 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FiUser, FiMail, FiHome, FiLogOut, FiCheck, FiX } from 'react-icons/fi';
-import axios from 'axios';
-import '../styles/Profile.css';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { FiUser, FiMail, FiHome, FiLogOut, FiCheck, FiX } from "react-icons/fi";
+import axios from "axios";
+import "../styles/Profile.css";
 
-import ToastService from '../assets/toastService';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import ToastService from "../assets/toastService";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000",
+});
 
 const Profile = () => {
-  const [userData, setUserData] = useState({ firstName: '', lastName: '', email: '' });
+  const [userData, setUserData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+  });
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -18,37 +26,37 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
 
       if (!token) {
-        ToastService.error('Usuário não autenticado.');
+        ToastService.error("Usuário não autenticado.");
         setLoading(false);
         return;
       }
 
-      ToastService.loading('loading-profile', 'Carregando dados do perfil...');
+      ToastService.loading("loading-profile", "Carregando dados do perfil...");
       try {
-        const res = await axios.get('http://localhost:5000/auth/me', {
+        const res = await api.get("/auth/me", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
         setUserData({
-          firstName: res.data.firstName || '',
-          lastName: res.data.lastName || '',
-          email: res.data.email || '',
+          firstName: res.data.firstName || "",
+          lastName: res.data.lastName || "",
+          email: res.data.email || "",
         });
-        ToastService.dismiss('loading-profile');
+        ToastService.dismiss("loading-profile");
       } catch (err) {
-        ToastService.dismiss('loading-profile');
+        ToastService.dismiss("loading-profile");
         if (err.response?.status === 401) {
-          ToastService.error('Sessão expirada. Faça login novamente.');
-          localStorage.removeItem('token');
-          navigate('/login');
+          ToastService.error("Sessão expirada. Faça login novamente.");
+          localStorage.removeItem("token");
+          navigate("/login");
         } else {
-          ToastService.error('Erro ao carregar dados do usuário.');
-          console.error('Erro ao buscar perfil:', err);
+          ToastService.error("Erro ao carregar dados do usuário.");
+          console.error("Erro ao buscar perfil:", err);
         }
       } finally {
         setLoading(false);
@@ -59,12 +67,12 @@ const Profile = () => {
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   const handleGoHome = () => {
-    navigate('/home');
+    navigate("/home");
   };
 
   const handleChange = (e) => {
@@ -79,21 +87,21 @@ const Profile = () => {
     setEditing(false);
     setLoading(true);
     (async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) return;
-      ToastService.loading('loading-profile', 'Recarregando dados...');
+      ToastService.loading("loading-profile", "Recarregando dados...");
       try {
-        const res = await axios.get('http://localhost:5000/auth/me', {
+        const res = await api.get("/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUserData({
-          firstName: res.data.firstName || '',
-          lastName: res.data.lastName || '',
-          email: res.data.email || '',
+          firstName: res.data.firstName || "",
+          lastName: res.data.lastName || "",
+          email: res.data.email || "",
         });
-        ToastService.dismiss('loading-profile');
+        ToastService.dismiss("loading-profile");
       } catch {
-        ToastService.dismiss('loading-profile');
+        ToastService.dismiss("loading-profile");
       } finally {
         setLoading(false);
       }
@@ -102,18 +110,18 @@ const Profile = () => {
 
   const handleSave = async () => {
     setSaving(true);
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
 
     if (!token) {
-      ToastService.error('Usuário não autenticado.');
+      ToastService.error("Usuário não autenticado.");
       setSaving(false);
       return;
     }
 
-    ToastService.loading('saving-profile', 'Salvando alterações...');
+    ToastService.loading("saving-profile", "Salvando alterações...");
     try {
-      await axios.patch(
-        'http://localhost:5000/auth/me',
+      await api.patch(
+        "/auth/me",
         {
           firstName: userData.firstName,
           lastName: userData.lastName,
@@ -125,14 +133,14 @@ const Profile = () => {
           },
         }
       );
-      ToastService.dismiss('saving-profile');
-      ToastService.success('Perfil atualizado com sucesso!');
+      ToastService.dismiss("saving-profile");
+      ToastService.success("Perfil atualizado com sucesso!");
       setEditing(false);
     } catch (err) {
-      ToastService.dismiss('saving-profile');
+      ToastService.dismiss("saving-profile");
       ToastService.error(
         err.response?.data?.msg ||
-          'Erro ao atualizar perfil. Verifique os dados e tente novamente.'
+          "Erro ao atualizar perfil. Verifique os dados e tente novamente."
       );
     } finally {
       setSaving(false);
@@ -140,18 +148,24 @@ const Profile = () => {
   };
 
   if (loading) {
-    return <div className="profile-container">Carregando...</div>;
+    return (
+      <div className="profile-container" aria-live="polite">
+        Carregando...
+      </div>
+    );
   }
 
   return (
-    <div className="profile-container" role="main">
+    <div className="profile-container" role="main" aria-label="Página de perfil do usuário">
       <div className="profile-card" aria-live="polite">
-        <h1 className="profile-title">Perfil</h1>
+        <h1 className="profile-title" tabIndex={0}>
+          Perfil
+        </h1>
 
         {userData ? (
           <div className="profile-info">
             <p>
-              <FiUser aria-hidden="true" /> <strong>Nome:</strong>{' '}
+              <FiUser aria-hidden="true" /> <strong>Nome:</strong>{" "}
               {editing ? (
                 <input
                   type="text"
@@ -166,7 +180,7 @@ const Profile = () => {
               )}
             </p>
             <p>
-              <FiUser aria-hidden="true" /> <strong>Sobrenome:</strong>{' '}
+              <FiUser aria-hidden="true" /> <strong>Sobrenome:</strong>{" "}
               {editing ? (
                 <input
                   type="text"
@@ -181,7 +195,7 @@ const Profile = () => {
               )}
             </p>
             <p>
-              <FiMail aria-hidden="true" /> <strong>Email:</strong>{' '}
+              <FiMail aria-hidden="true" /> <strong>Email:</strong>{" "}
               {editing ? (
                 <input
                   type="email"
@@ -233,7 +247,9 @@ const Profile = () => {
                 aria-label="Salvar alterações"
                 disabled={saving}
               >
-                {saving ? 'Salvando...' : (
+                {saving ? (
+                  "Salvando..."
+                ) : (
                   <>
                     <FiCheck aria-hidden="true" /> Salvar
                   </>

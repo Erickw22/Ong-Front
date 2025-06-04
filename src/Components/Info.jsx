@@ -8,7 +8,7 @@ import "../styles/teste.css";
 import ToastService from "../assets/toastService";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/ongs",
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000",
 });
 
 const Info = () => {
@@ -22,7 +22,7 @@ const Info = () => {
       setLoading(true);
       ToastService.loading("loading-ong", "Carregando detalhes da ONG...");
       try {
-        const res = await api.get(`/details/${id}`);
+        const res = await api.get(`/ongs/details/${id}`);
         setOng(res.data);
         ToastService.dismiss("loading-ong");
         ToastService.success("Detalhes carregados com sucesso!");
@@ -41,12 +41,17 @@ const Info = () => {
     navigate("/home");
   };
 
-  if (loading) return <p>Carregando informações da ONG...</p>;
-  if (!ong) return <p>Detalhes da ONG não encontrados.</p>;
+  if (loading) {
+    return <p aria-live="polite">Carregando informações da ONG...</p>;
+  }
+
+  if (!ong) {
+    return <p aria-live="polite">Detalhes da ONG não encontrados.</p>;
+  }
 
   return (
-    <div className="info-ong-wrapper">
-      <h2>{ong.name}</h2>
+    <div className="info-ong-wrapper" role="main" aria-label={`Detalhes da ONG ${ong.name}`}>
+      <h2 tabIndex={0}>{ong.name}</h2>
       <p>
         <strong>Endereço:</strong> {ong.address}
       </p>
@@ -60,7 +65,7 @@ const Info = () => {
         <strong>Descrição:</strong> {ong.description || "Sem descrição"}
       </p>
 
-      <div className="social-media">
+      <div className="social-media" aria-label="Redes sociais">
         <h3>Redes Sociais</h3>
         {ong.socialMedia ? (
           <>
@@ -71,6 +76,7 @@ const Info = () => {
                   href={ong.socialMedia.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="Link para Instagram"
                 >
                   {ong.socialMedia.instagram}
                 </a>
@@ -83,6 +89,7 @@ const Info = () => {
                   href={ong.socialMedia.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="Link para Facebook"
                 >
                   {ong.socialMedia.facebook}
                 </a>
@@ -95,6 +102,7 @@ const Info = () => {
                   href={ong.socialMedia.twitter}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="Link para Twitter"
                 >
                   {ong.socialMedia.twitter}
                 </a>
@@ -113,7 +121,7 @@ const Info = () => {
         <strong>Pix:</strong> {ong.pixKey || "Não informado"}
       </p>
 
-      <button className="btn-base" onClick={handleBack}>
+      <button className="btn-base" onClick={handleBack} aria-label="Voltar para a página inicial">
         Voltar
       </button>
 
