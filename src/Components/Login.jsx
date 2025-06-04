@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { FiLogIn, FiMail, FiLock } from "react-icons/fi";
 import "../styles/Login.css";
 
-import api from "../services/api";
+import api from "../services/axios";
 import ToastService from "../assets/toastService";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
