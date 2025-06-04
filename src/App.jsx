@@ -1,26 +1,17 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-  useLocation,
-} from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Login from './Components/Login';
+import Profile from './Components/Profile';
+import Register from './Components/Register';
+import Home from './Components/Home';
+import Info from './Components/Info';
 
-import Login from "./Components/Login";
-import Profile from "./Components/Profile";
-import Register from "./Components/Register";
-import Home from "./Components/Home";
-import Info from "./Components/Info";
+const App = () => {
+  const isLoggedIn = () => !!localStorage.getItem('token');
 
-const isLoggedIn = () => !!localStorage.getItem("token");
-
-const ProtectedRoute = ({ children }) => {
-  const location = useLocation();
-
-  if (!isLoggedIn()) {
-    if (location.pathname !== "/login" && location.pathname !== "/register") {
+  const ProtectedRoute = ({ children }) => {
+    if (!isLoggedIn()) {
       toast.warn("Você precisa estar logado para acessar esta página.", {
         position: "top-right",
         autoClose: 3000,
@@ -30,35 +21,29 @@ const ProtectedRoute = ({ children }) => {
         draggable: true,
         theme: "colored",
       });
+      return <Navigate to="/login" replace />;
     }
-    return <Navigate to="/login" replace />;
-  }
+    return children;
+  };
 
-  return children;
-};
-
-const App = () => {
   return (
     <>
       <Router>
         <Routes>
-          {/* Rota raiz: decide se vai para Home ou Login */}
           <Route
             path="/"
             element={
               isLoggedIn() ? (
-                <Navigate to="/home" replace />
-              ) : (
                 <Navigate to="/login" replace />
+              ) : (
+                <Navigate to="/home" replace />
               )
             }
           />
 
-          {/* Rotas públicas */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Rotas protegidas */}
           <Route
             path="/home"
             element={
@@ -81,12 +66,11 @@ const App = () => {
             path="/ong/:id"
             element={
               <ProtectedRoute>
-                <Info />
+                <InfoOngs />
               </ProtectedRoute>
             }
           />
 
-          {/* Rota coringa: redireciona sempre para / */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
