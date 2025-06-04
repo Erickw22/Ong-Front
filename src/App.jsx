@@ -19,7 +19,6 @@ const ProtectedRoute = ({ children }) => {
   const location = useLocation();
 
   if (!isLoggedIn()) {
-    // Mostra toast apenas se não for na raiz "/"
     if (location.pathname !== "/") {
       toast.warn("Você precisa estar logado para acessar esta página.", {
         position: "top-right",
@@ -33,7 +32,8 @@ const ProtectedRoute = ({ children }) => {
     }
     return <Navigate to="/login" replace />;
   }
-  return children;
+
+  return <>{children}</>;
 };
 
 const App = () => {
