@@ -5,7 +5,7 @@ import Login from './Components/Login';
 import Profile from './Components/Profile';
 import Register from './Components/Register';
 import Home from './Components/Home';
-import InfoOngs from './Components/infoOngs';
+import Info from './Components/Info';
 
 const App = () => {
   const isLoggedIn = () => !!localStorage.getItem('token');
@@ -66,7 +66,7 @@ const App = () => {
             path="/ong/:id"
             element={
               <ProtectedRoute>
-                <InfoOngs />
+                <Info />
               </ProtectedRoute>
             }
           />

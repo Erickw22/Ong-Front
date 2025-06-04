@@ -11,7 +11,7 @@ const api = axios.create({
   baseURL: "http://localhost:5000/ongs",
 });
 
-const InfoOngs = () => {
+const Info = () => {
   const { id } = useParams();
   const [ong, setOng] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -122,4 +122,4 @@ const InfoOngs = () => {
   );
 };
 
-export default InfoOngs;
+export default Info;
