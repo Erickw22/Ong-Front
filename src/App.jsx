@@ -1,14 +1,19 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import Login from './Components/Login';
-import Profile from './Components/Profile';
-import Register from './Components/Register';
-import Home from './Components/Home';
-import Info from './Components/Info';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Login from "./Components/Login";
+import Profile from "./Components/Profile";
+import Register from "./Components/Register";
+import Home from "./Components/Home";
+import Info from "./Components/Info";
 
 const App = () => {
-  const isLoggedIn = () => !!localStorage.getItem('token');
+  const isLoggedIn = () => !!localStorage.getItem("token");
 
   const ProtectedRoute = ({ children }) => {
     if (!isLoggedIn()) {
@@ -34,9 +39,9 @@ const App = () => {
             path="/"
             element={
               isLoggedIn() ? (
-                <Navigate to="/login" replace />
-              ) : (
                 <Navigate to="/home" replace />
+              ) : (
+                <Navigate to="/login" replace />
               )
             }
           />
