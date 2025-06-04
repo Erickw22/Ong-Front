@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 import Login from "./Components/Login";
 import Profile from "./Components/Profile";
 import Register from "./Components/Register";
@@ -19,7 +20,7 @@ const ProtectedRoute = ({ children }) => {
   const location = useLocation();
 
   if (!isLoggedIn()) {
-    if (location.pathname !== "/") {
+    if (location.pathname !== "/login" && location.pathname !== "/register") {
       toast.warn("Você precisa estar logado para acessar esta página.", {
         position: "top-right",
         autoClose: 3000,
@@ -33,7 +34,7 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  return <>{children}</>;
+  return children;
 };
 
 const App = () => {
@@ -41,6 +42,7 @@ const App = () => {
     <>
       <Router>
         <Routes>
+          {/* Rota raiz: decide se vai para Home ou Login */}
           <Route
             path="/"
             element={
@@ -52,9 +54,11 @@ const App = () => {
             }
           />
 
+          {/* Rotas públicas */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
+          {/* Rotas protegidas */}
           <Route
             path="/home"
             element={
@@ -82,6 +86,7 @@ const App = () => {
             }
           />
 
+          {/* Rota coringa: redireciona sempre para / */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
