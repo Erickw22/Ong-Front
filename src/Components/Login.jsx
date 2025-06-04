@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../services/axios";
 import { useNavigate, Link } from "react-router-dom";
 import { FiLogIn, FiMail, FiLock } from "react-icons/fi";
 import "../styles/Login.css";
@@ -23,7 +23,7 @@ const Login = () => {
     setIsLoading(true);
     ToastService.loading("login-loading", "Validando credenciais...");
     try {
-      const res = await axios.post("https://apiong-w1tp.onrender.com/auth/login", formData);
+      const res = await api.post("/auth/login", formData);
 
       localStorage.setItem("token", res.data.token);
       ToastService.dismiss("login-loading");
