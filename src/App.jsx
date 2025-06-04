@@ -3,6 +3,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,11 +13,14 @@ import Register from "./Components/Register";
 import Home from "./Components/Home";
 import Info from "./Components/Info";
 
-const App = () => {
-  const isLoggedIn = () => !!localStorage.getItem("token");
+const isLoggedIn = () => !!localStorage.getItem("token");
 
-  const ProtectedRoute = ({ children }) => {
-    if (!isLoggedIn()) {
+const ProtectedRoute = ({ children }) => {
+  const location = useLocation();
+
+  if (!isLoggedIn()) {
+    // Mostra toast apenas se não for na raiz "/"
+    if (location.pathname !== "/") {
       toast.warn("Você precisa estar logado para acessar esta página.", {
         position: "top-right",
         autoClose: 3000,
@@ -26,11 +30,13 @@ const App = () => {
         draggable: true,
         theme: "colored",
       });
-      return <Navigate to="/login" replace />;
     }
-    return children;
-  };
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
 
+const App = () => {
   return (
     <>
       <Router>
