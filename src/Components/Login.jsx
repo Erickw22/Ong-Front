@@ -23,7 +23,7 @@ const Login = () => {
     setIsLoading(true);
     ToastService.loading("login-loading", "Validando credenciais...");
     try {
-      const res = await axios.post("http://localhost:5000/auth/login", formData);
+      const res = await axios.post("https://apiong-w1tp.onrender.com/auth/login", formData);
 
       localStorage.setItem("token", res.data.token);
       ToastService.dismiss("login-loading");
